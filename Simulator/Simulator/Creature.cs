@@ -47,12 +47,34 @@ internal class Creature
         Level = level;
     }
 
-    public Creature() { }
+    public Creature()
+    {
+    }
 
     public void SayHi() => Console.WriteLine($"Hi, I'm {Name}, my level is {Level}.");
 
     public void Upgrade()
     {
         if (Level < 10) Level++;
+    }
+
+    public void Go(Direction direction)
+    {
+        string directionText = direction.ToString().ToLower();
+        Console.WriteLine($"{Name} goes {directionText}.");
+    }
+
+    public void Go(Direction[] directions)
+    {
+        foreach (var direction in directions)
+        {
+            Go(direction);
+        }
+    }
+
+    public void Go(string directions)
+    {
+        var parsedDirections = DirectionParser.Parse(directions);
+        Go(parsedDirections);
     }
 }
