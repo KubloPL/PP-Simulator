@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/Kuba/RiderProjects/Simulator/Simulator/Simulator.csproj",
+      "projectUniqueName": "/Users/Kuba/RiderProjects/Simulator/Simulator/Simulator/Simulator.csproj",
       "projectName": "Simulator",
-      "projectPath": "/Users/Kuba/RiderProjects/Simulator/Simulator/Simulator.csproj",
+      "projectPath": "/Users/Kuba/RiderProjects/Simulator/Simulator/Simulator/Simulator.csproj",
       "packagesPath": "/Users/Kuba/.nuget/packages/",
-      "outputPath": "/Users/Kuba/RiderProjects/Simulator/Simulator/obj/",
+      "outputPath": "/Users/Kuba/RiderProjects/Simulator/Simulator/Simulator/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/Kuba/.nuget/NuGet/NuGet.Config"

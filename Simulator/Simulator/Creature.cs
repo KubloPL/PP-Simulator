@@ -1,24 +1,58 @@
 namespace Simulator;
 
-public class Creature
+internal class Creature
 {
-    public string Name { get; set; }
-    public int Level { get; set; }
-    
-    public Creature(string name, int level = 1)
+    private string _name = "Unknown";
+    private int _level = 1;
+    private bool _isNameSet = false;
+    private bool _isLevelSet = false;
+
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            if (_isNameSet) return;
+
+            _name = value.Trim();
+            if (_name.Length < 3)
+                _name = _name.PadRight(3, '#');
+            else if (_name.Length > 25)
+                _name = _name.Substring(0, 25).TrimEnd().PadRight(3, '#');
+
+            if (char.IsLower(_name[0]))
+                _name = char.ToUpper(_name[0]) + _name.Substring(1);
+
+            _isNameSet = true;
+        }
+    }
+
+    public int Level
+    {
+        get => _level;
+        set
+        {
+            if (_isLevelSet) return;
+
+            _level = value < 1 ? 1 : (value > 10 ? 10 : value);
+            _isLevelSet = true;
+        }
+    }
+
+    public string Info => $"{Name} - [{Level}]";
+
+    public Creature(string name = "Unknown", int level = 1)
     {
         Name = name;
         Level = level;
     }
-    
-    public Creature()
+
+    public Creature() { }
+
+    public void SayHi() => Console.WriteLine($"Hi, I'm {Name}, my level is {Level}.");
+
+    public void Upgrade()
     {
-    }
-    
-    public string Info => $"{Name}, Level {Level}";
-    
-    public void SayHi()
-    {
-        Console.WriteLine($"Hi, I'm {Name} at level {Level}!");
+        if (Level < 10) Level++;
     }
 }
