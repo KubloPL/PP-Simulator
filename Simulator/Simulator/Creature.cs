@@ -10,36 +10,20 @@ public abstract class Creature
     public string Name
     {
         get => _name;
-        set
-        {
-            if (_isNameSet) return;
-
-            _name = value.Trim();
-            if (_name.Length < 3)
-                _name = _name.PadRight(3, '#');
-            else if (_name.Length > 25)
-                _name = _name.Substring(0, 25).TrimEnd().PadRight(3, '#');
-
-            if (char.IsLower(_name[0]))
-                _name = char.ToUpper(_name[0]) + _name.Substring(1);
-
-            _isNameSet = true;
-        }
+        set => _name = Validator.Shortener(value, 3, 25, '#');
     }
 
     public int Level
     {
         get => _level;
-        set
-        {
-            if (_isLevelSet) return;
+        set => _level = Validator.Limiter(value, 1, 10);
 
-            _level = value < 1 ? 1 : (value > 10 ? 10 : value);
-            _isLevelSet = true;
-        }
     }
 
-    public string Info => $"{Name} - [{Level}]";
+    public abstract string Info { get; }
+    public override string ToString() => $"{GetType().Name.ToUpper()}: {Info}";
+
+
 
     public Creature(string name = "Unknown", int level = 1)
     {
