@@ -1,64 +1,48 @@
 ﻿namespace Simulator;
-
 internal class Program
 {
-    static void Main(string[] args)
+    static void Lab5a()
     {
-        Console.WriteLine("Starting Simulator!\n");
-        Lab4a();
-        Creature c = new Elf("Elandor", 5, 3);
-        Console.WriteLine(c);  // ELF: Elandor [5]
-        Lab4b();
-    }
+        Random random = new Random();
 
-    static void Lab4a()
-    {
-        Console.WriteLine("HUNT TEST\n");
-        var o = new Orc() { Name = "Gorbag", Rage = 7 };
-        o.SayHi();
-        for (int i = 0; i < 10; i++)
+        try
         {
-            o.Hunt();
-            o.SayHi();
+            int x1 = random.Next(-10, 10);
+            int y1 = random.Next(-10, 10);
+            int x2 = random.Next(-10, 10);
+            int y2 = random.Next(-10, 10);
+            
+            Console.WriteLine($"Attempting to create rectangle with coordinates: ({x1}, {y1}) and ({x2}, {y2})");
+            
+            Rectangle rectangle1 = new Rectangle(x1, y1, x2, y2);
+            Console.WriteLine($"rectangle1: {rectangle1}");
+            
+            Point p1 = new Point(random.Next(-10, 10), random.Next(-10, 10));
+            Point p2 = new Point(random.Next(-10, 10), random.Next(-10, 10));
+            
+            Console.WriteLine($"Attempting to create rectangle with points: {p1} and {p2}");
+
+            
+            Rectangle rectangle2 = new Rectangle(p1, p2);
+            Console.WriteLine($"rectangle2: {rectangle2}");
+            
+            Point pointInside = new Point(random.Next(Math.Min(x1, x2), Math.Max(x1, x2)),
+                random.Next(Math.Min(y1, y2), Math.Max(y1, y2)));
+            Point pointOutside = new Point(random.Next(-20, -11), random.Next(-20, -11));
+
+            Console.WriteLine(
+                $"Punkt {pointInside} wewnatrz prostokata {rectangle1}: {rectangle1.Contains(pointInside)}");
+            Console.WriteLine(
+                $"Punkt {pointOutside} wewnatrz prostokata {rectangle1}: {rectangle1.Contains(pointOutside)}");
         }
-
-        Console.WriteLine("\nSING TEST\n");
-        var e = new Elf("Legolas", agility: 2);
-        e.SayHi();
-        for (int i = 0; i < 10; i++)
+        catch (ArgumentException error)
         {
-            e.Sing();
-            e.SayHi();
-        }
-
-        Console.WriteLine("\nPOWER TEST\n");
-        Creature[] creatures = {
-            o,
-            e,
-            new Orc("Morgash", 3, 8),
-            new Elf("Elandor", 5, 3)
-        };
-        foreach (Creature creature in creatures)
-        {
-            Console.WriteLine($"{creature.Name,-15}: {creature.Power}");
+            Console.WriteLine("Error creating rectangle: " + error.Message);
         }
     }
-    static void Lab4b()
+
+    public static void Main(string[] args)
     {
-        object[] myObjects = {
-            new Animals() { Description = "dogs"},
-            new Birds { Description = "  eagles ", Size = 10 },
-            new Elf("e", 15, -3),
-            new Orc("morgash", 6, 4)
-        };
-        Console.WriteLine("\nMy objects:");
-        foreach (var o in myObjects) Console.WriteLine(o);
-        /*
-            My objects:
-            ANIMALS: Dogs <3>
-            BIRDS: Eagles (fly+) <10>
-            ELF: E## [10][0]
-            ORC: Morgash [6][4]
-        */
+        Lab5a();
     }
 }
