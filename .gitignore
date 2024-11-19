@@ -1,0 +1,37 @@
+# Ignore IntelliJ IDEA files
+.idea/
+*.iml
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Windows system files
+Thumbs.db
+desktop.ini
+
+# Ignore build outputs and other generated files
+bin/
+obj/
+*.log
+*.tmp
+
+# Ignore user-specific files
+*.user
+*.suo
+*.swp
+*.bak
+
+# Ignore temporary files created by editors
+*.vs/
+*.vscode/
+
+# Ignore dependency folders
+node_modules/
+packages/
+
+# Ignore environmental files
+.env
+
+# Ignore JetBrains Rider settings
+.idea/
+*.sln.iml

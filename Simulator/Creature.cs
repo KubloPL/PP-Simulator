@@ -17,13 +17,10 @@ public abstract class Creature
     {
         get => _level;
         set => _level = Validator.Limiter(value, 1, 10);
-
     }
 
     public abstract string Info { get; }
     public override string ToString() => $"{GetType().Name.ToUpper()}: {Info}";
-
-
 
     public Creature(string name = "Unknown", int level = 1)
     {
@@ -35,7 +32,7 @@ public abstract class Creature
     {
     }
 
-    public abstract void SayHi();
+    public abstract string Greeting();
 
     public abstract int Power { get; }
 
@@ -44,23 +41,16 @@ public abstract class Creature
         if (Level < 10) Level++;
     }
 
-    public void Go(Direction direction)
+    public string Go(Direction direction) => $"{direction.ToString().ToLower()}";
+
+    public string[] Go(Direction[] directions)
     {
-        string directionText = direction.ToString().ToLower();
-        Console.WriteLine($"{Name} goes {directionText}.");
+        return directions.Select(direction => Go(direction)).ToArray();
     }
 
-    public void Go(Direction[] directions)
-    {
-        foreach (var direction in directions)
-        {
-            Go(direction);
-        }
-    }
-
-    public void Go(string directions)
+    public string[] Go(string directions)
     {
         var parsedDirections = DirectionParser.Parse(directions);
-        Go(parsedDirections);
+        return Go(parsedDirections);
     }
 }
