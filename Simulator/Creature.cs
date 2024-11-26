@@ -50,7 +50,7 @@ public abstract class Creature
 
     public string[] Go(string directions)
     {
-        var parsedDirections = DirectionParser.Parse(directions);
-        return Go(parsedDirections);
+        var parsedDirections = DirectionParser.Parse(directions); 
+        return Go(parsedDirections.ToArray());
     }
 }
