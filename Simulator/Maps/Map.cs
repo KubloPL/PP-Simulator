@@ -1,5 +1,7 @@
 using System;
 using System.Drawing;
+using System.Collections.Generic;
+using Simulator;
 
 namespace Simulator.Maps
 {
@@ -26,10 +28,18 @@ namespace Simulator.Maps
         
         public virtual bool Exist(Point point) => bounds.Contains(point);
 
-
         public abstract Point Next(Point start, Direction direction);
 
-
         public abstract Point NextDiagonal(Point start, Direction direction);
+        
+        public abstract void Add(Creature creature, Point point);
+        
+        public abstract void Remove(Creature creature, Point point);
+        
+        public abstract void Move(Creature creature, Point from, Point to);
+        
+        public abstract IEnumerable<Creature> At(Point point);
+        
+        public abstract IEnumerable<Creature> At(int x, int y);
     }
 }
