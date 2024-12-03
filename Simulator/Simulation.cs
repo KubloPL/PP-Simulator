@@ -6,7 +6,7 @@ using Simulator.Maps;
 namespace Simulator
 {
     /// <summary>
-    /// Manages the simulation of creatures moving on a map.
+    /// Manages the simulation of creatures (or mappable entities) moving on a map.
     /// </summary>
     public class Simulation
     {
@@ -16,69 +16,75 @@ namespace Simulator
         public Map Map { get; }
 
         /// <summary>
-        /// Creatures moving on the map.
+        /// Entities (creatures or other mappable objects) moving on the map.
         /// </summary>
-        public List<Creature> Creatures { get; }
+        public List<IMappable> Creatures { get; }
 
         /// <summary>
-        /// Starting positions of creatures.
+        /// Starting positions of the entities.
         /// </summary>
         public List<Point> Positions { get; }
 
         /// <summary>
-        /// Cyclic list of creatures moves.
-        /// Bad moves are ignored - use DirectionParser.
-        /// First move is for first creature, second for second and so on.
-        /// When all creatures make moves, 
-        /// next move is again for first creature and so on.
+        /// Sequence of moves for the entities.
+        /// Moves are parsed to directions using the DirectionParser.
+        /// Moves are assigned cyclically: the first move to the first creature, the second to the second, and so on.
         /// </summary>
         public string Moves { get; }
 
         /// <summary>
-        /// Has all moves been done?
+        /// Indicates whether all moves have been completed.
         /// </summary>
         public bool Finished { get; private set; } = false;
 
         /// <summary>
-        /// Creature which will be moving current turn.
+        /// The current entity that will perform the next move.
         /// </summary>
-        public Creature CurrentCreature
+        public IMappable CurrentMappable
         {
             get
             {
                 if (Finished || _currentMoveIndex >= _parsedMoves.Count)
-                    throw new InvalidOperationException("All moves have been completed or simulation is finished.");
+                    throw new InvalidOperationException("All moves have been completed or the simulation is finished.");
 
                 return Creatures[_currentMoveIndex % Creatures.Count];
             }
         }
 
         /// <summary>
-        /// Lowercase name of direction which will be used in current turn.
+        /// The name of the current move, in lowercase.
         /// </summary>
         public string CurrentMoveName
         {
             get
             {
                 if (Finished || _currentMoveIndex >= _parsedMoves.Count)
-                    throw new InvalidOperationException("All moves have been completed or simulation is finished.");
+                    throw new InvalidOperationException("All moves have been completed or the simulation is finished.");
 
                 return _parsedMoves[_currentMoveIndex].ToString().ToLower();
             }
         }
-        
+
+        /// <summary>
+        /// List of parsed directions from the moves string.
+        /// </summary>
         private readonly List<Direction> _parsedMoves;
+
+        /// <summary>
+        /// Index of the current move in the parsed moves list.
+        /// </summary>
         private int _currentMoveIndex = 0;
 
         /// <summary>
-        /// Simulation constructor.
-        /// Throws errors:
-        /// - if creatures' list is empty,
-        /// - if number of creatures differs from 
-        ///   number of starting positions.
+        /// Constructor for the simulation.
+        /// Validates inputs and initializes the simulation state.
+        /// Throws exceptions if:
+        /// - The map is null,
+        /// - The creatures list is null or empty,
+        /// - The positions list is null or empty,
+        /// - The number of creatures does not match the number of positions.
         /// </summary>
-        public Simulation(Map map, List<Creature> creatures, 
-                          List<Point> positions, string moves)
+        public Simulation(Map map, List<IMappable> creatures, List<Point> positions, string moves)
         {
             if (map == null)
                 throw new ArgumentNullException(nameof(map), "Map cannot be null.");
@@ -90,30 +96,35 @@ namespace Simulator
                 throw new ArgumentException("Positions list cannot be null or empty.", nameof(positions));
 
             if (creatures.Count != positions.Count)
-                throw new ArgumentException("Number of creatures must match number of starting positions.");
+                throw new ArgumentException("Number of creatures must match the number of starting positions.");
 
             Map = map;
             Creatures = creatures;
             Positions = positions;
             Moves = moves ?? string.Empty;
-            
+
+            // Initialize each creature's position on the map
             for (int i = 0; i < creatures.Count; i++)
             {
-                Creature creature = creatures[i];
+                IMappable creature = creatures[i];
                 Point position = positions[i];
 
                 if (!Map.Exist(position))
                     throw new ArgumentException($"Starting position {position} is out of map bounds for creature {creature.Name}.");
 
-                creature.AssignMap(Map, position);
+                creature.InitMapAndPosition(Map, position);
             }
-            
+
+            // Parse the moves into a list of directions
             _parsedMoves = DirectionParser.Parse(moves);
         }
 
         /// <summary>
-        /// Makes one move of current creature in current direction.
-        /// Throws error if simulation is finished.
+        /// Performs one turn in the simulation.
+        /// The current creature executes its assigned move.
+        /// Throws an error if:
+        /// - The simulation is already finished,
+        /// - There are no more moves to execute.
         /// </summary>
         public void Turn()
         {
@@ -125,14 +136,18 @@ namespace Simulator
                 Finished = true;
                 throw new InvalidOperationException("No more moves to perform. The simulation has finished.");
             }
-            
-            Creature creatureToMove = Creatures[_currentMoveIndex % Creatures.Count];
+
+            // Determine which creature should move and in what direction
+            IMappable creatureToMove = Creatures[_currentMoveIndex % Creatures.Count];
             Direction direction = _parsedMoves[_currentMoveIndex];
-            
+
+            // Execute the move
             creatureToMove.Go(direction);
-            
+
+            // Increment the move index
             _currentMoveIndex++;
-            
+
+            // Check if all moves are completed
             if (_currentMoveIndex >= _parsedMoves.Count)
                 Finished = true;
         }

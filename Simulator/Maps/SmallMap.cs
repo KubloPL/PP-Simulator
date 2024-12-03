@@ -7,7 +7,7 @@ namespace Simulator.Maps
 {
     public abstract class SmallMap : Map
     {
-        private readonly Dictionary<Point, List<Creature>> _creatures = new Dictionary<Point, List<Creature>>();
+        private readonly Dictionary<Point, List<IMappable>> _mappables = new Dictionary<Point, List<IMappable>>();
         private readonly object _lock = new object();
 
         protected SmallMap(int sizeX, int sizeY) : base(sizeX, sizeY)
@@ -22,58 +22,58 @@ namespace Simulator.Maps
                 throw new ArgumentOutOfRangeException(parameterName, message);
         }
 
-        public override void Add(Creature creature, Point point)
+        public override void Add(IMappable mappable, Point point)
         {
             if (!Exist(point))
                 throw new ArgumentException("Point is out of map bounds", nameof(point));
 
             lock (_lock)
             {
-                if (!_creatures.ContainsKey(point))
+                if (!_mappables.ContainsKey(point))
                 {
-                    _creatures[point] = new List<Creature>();
+                    _mappables[point] = new List<IMappable>();
                 }
-                _creatures[point].Add(creature);
+                _mappables[point].Add(mappable);
             }
         }
 
-        public override void Remove(Creature creature, Point point)
+        public override void Remove(IMappable mappable, Point point)
         {
             lock (_lock)
             {
-                if (_creatures.TryGetValue(point, out var creatures))
+                if (_mappables.TryGetValue(point, out var mappables))
                 {
-                    creatures.Remove(creature);
-                    if (creatures.Count == 0)
+                    mappables.Remove(mappable);
+                    if (mappables.Count == 0)
                     {
-                        _creatures.Remove(point);
+                        _mappables.Remove(point);
                     }
                 }
             }
         }
 
-        public override void Move(Creature creature, Point from, Point to)
+        public override void Move(IMappable mappable, Point from, Point to)
         {
             lock (_lock)
             {
-                Remove(creature, from);
-                Add(creature, to);
+                Remove(mappable, from);
+                Add(mappable, to);
             }
         }
 
-        public override IEnumerable<Creature> At(Point point)
+        public override IEnumerable<IMappable> At(Point point)
         {
             lock (_lock)
             {
-                if (_creatures.TryGetValue(point, out var creatures))
+                if (_mappables.TryGetValue(point, out var mappables))
                 {
-                    return new List<Creature>(creatures);
+                    return new List<IMappable>(mappables);
                 }
-                return new List<Creature>();
+                return new List<IMappable>();
             }
         }
 
-        public override IEnumerable<Creature> At(int x, int y)
+        public override IEnumerable<IMappable> At(int x, int y)
         {
             return At(new Point(x, y));
         }

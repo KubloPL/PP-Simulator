@@ -32,14 +32,14 @@ namespace Simulator.Maps
 
         public abstract Point NextDiagonal(Point start, Direction direction);
         
-        public abstract void Add(Creature creature, Point point);
+        public abstract void Add(IMappable mappable, Point point); 
         
-        public abstract void Remove(Creature creature, Point point);
+        public abstract void Remove(IMappable mappable, Point point);
         
-        public abstract void Move(Creature creature, Point from, Point to);
+        public abstract void Move(IMappable mappable, Point from, Point to); 
         
-        public abstract IEnumerable<Creature> At(Point point);
+        public abstract IEnumerable<IMappable> At(Point point);
         
-        public abstract IEnumerable<Creature> At(int x, int y);
+        public abstract IEnumerable<IMappable> At(int x, int y); 
     }
 }

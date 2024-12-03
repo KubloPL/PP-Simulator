@@ -4,7 +4,7 @@ using Simulator.Maps;
 
 namespace Simulator
 {
-    public abstract class Creature
+    public abstract class Creature : IMappable
     {
         private string _name = "Unknown";
         private int _level = 1;
@@ -60,7 +60,7 @@ namespace Simulator
 
         public bool IsPlaced => _map != null;
         
-        public void AssignMap(Map map, Point initialPosition)
+        public void InitMapAndPosition(Map map, Point initialPosition)
         {
             if (map == null)
                 throw new ArgumentNullException(nameof(map));
