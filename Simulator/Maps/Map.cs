@@ -41,5 +41,7 @@ namespace Simulator.Maps
         public abstract IEnumerable<IMappable> At(Point point);
         
         public abstract IEnumerable<IMappable> At(int x, int y); 
+        
+        public abstract IEnumerable<IMappable> GetAllMappables();
     }
 }

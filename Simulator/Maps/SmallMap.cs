@@ -77,5 +77,19 @@ namespace Simulator.Maps
         {
             return At(new Point(x, y));
         }
+
+        public override IEnumerable<IMappable> GetAllMappables()
+        {
+            lock (_lock)
+            {
+                foreach (var mappables in _mappables.Values)
+                {
+                    foreach (var mappable in mappables)
+                    {
+                        yield return mappable;
+                    }
+                }
+            }
+        }
     }
 }

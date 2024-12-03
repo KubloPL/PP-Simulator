@@ -1,18 +1,41 @@
-namespace Simulator;
+using System;
+using System.Drawing;
+using Simulator.Maps;
 
-internal class Birds : Animals
+namespace Simulator
 {
-    private readonly bool _canFly = true;
-
-    public bool CanFly
+    public class Birds : Animals
     {
-        get => _canFly;
-        init => _canFly = value;
-    }
+        private readonly bool _canFly = true;
 
-    public override string Info()
-    {
-        string flyAbility = CanFly ? "fly+" : "fly-";
-        return $"{Description} ({flyAbility}) <{Size}>";
+        public bool CanFly
+        {
+            get => _canFly;
+            init => _canFly = value;
+        }
+
+        public override string Info()
+        {
+            string flyAbility = CanFly ? "fly+" : "fly-";
+            return $"{Description} ({flyAbility}) <{Size}>";
+        }
+
+        public override void Go(Direction direction)
+        {
+            if (map == null)
+                throw new Exception("Map not initialized.");
+
+            if (CanFly)
+            {
+                position = map.Next(position, direction);
+                position = map.Next(position, direction);
+            }
+            else
+            {
+                position = map.NextDiagonal(position, direction);
+            }
+        }
+
+        public override char Symbol => CanFly ? 'B' : 'b'; // 'B' for flying birds, 'b' for non-flying birds
     }
 }

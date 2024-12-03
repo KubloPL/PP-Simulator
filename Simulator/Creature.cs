@@ -20,10 +20,15 @@ namespace Simulator
             get => _level;
             set => _level = Validator.Limiter(value, 1, 10);
         }
-
+        
         public abstract string Info { get; }
-        public override string ToString() => $"{GetType().Name.ToUpper()}: {Info}";
+        public abstract string Greeting();
+        public abstract int Power { get; }
+        
+        public abstract char Symbol { get; }
 
+        public override string ToString() => $"{GetType().Name.ToUpper()}: {Info}";
+        
         public Creature(string name = "Unknown", int level = 1)
         {
             Name = name;
@@ -34,15 +39,11 @@ namespace Simulator
         {
         }
 
-        public abstract string Greeting();
-
-        public abstract int Power { get; }
-
         public void Upgrade()
         {
             if (Level < 10) Level++;
         }
-
+        
         private Map _map;
         private Point _position;
 
@@ -59,7 +60,7 @@ namespace Simulator
         }
 
         public bool IsPlaced => _map != null;
-        
+
         public void InitMapAndPosition(Map map, Point initialPosition)
         {
             if (map == null)
@@ -76,7 +77,7 @@ namespace Simulator
             _position = initialPosition;
             _map.Add(this, _position);
         }
-        
+
         public void Go(Direction direction)
         {
             if (!IsPlaced)

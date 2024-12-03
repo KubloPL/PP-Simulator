@@ -26,121 +26,99 @@ namespace SimConsole
         /// Draws the current state of the map to the console.
         /// </summary>
         public void Draw()
-{
-    // Create a 2D grid to represent the map
-    char[,] grid = new char[_map.SizeY, _map.SizeX];
-
-    // Initialize grid with empty spaces
-    for (int y = 0; y < _map.SizeY; y++)
-    {
-        for (int x = 0; x < _map.SizeX; x++)
         {
-            grid[y, x] = ' ';
-        }
-    }
+            // Create a 2D grid to represent the map
+            char[,] grid = new char[_map.SizeY, _map.SizeX];
 
-    // Populate grid with mappables
-    foreach (var mappable in _map.GetAllMappables())
-    {
-        Point pos = mappable.Position;
-        if (_map.Exist(pos))
-        {
-            // Determine the symbol based on mappable type
-            char symbol = GetSymbol(mappable);
-
-            // If multiple mappables are on the same position, mark as 'X'
-            if (grid[pos.Y, pos.X] == ' ' || grid[pos.Y, pos.X] == symbol)
+            // Initialize grid with empty spaces
+            for (int y = 0; y < _map.SizeY; y++)
             {
-                grid[pos.Y, pos.X] = symbol;
+                for (int x = 0; x < _map.SizeX; x++)
+                {
+                    grid[y, x] = ' ';
+                }
             }
-            else
+
+            // Populate grid with mappables
+            foreach (var mappable in GetAllMappables())
             {
-                grid[pos.Y, pos.X] = 'X';
+                Point pos = mappable.Position;
+                if (_map.Exist(pos))
+                {
+                    char symbol = mappable.Symbol;
+
+                    // If multiple mappables are on the same position, mark as 'X'
+                    if (grid[pos.Y, pos.X] == ' ' || grid[pos.Y, pos.X] == symbol)
+                    {
+                        grid[pos.Y, pos.X] = symbol;
+                    }
+                    else
+                    {
+                        grid[pos.Y, pos.X] = 'X';
+                    }
+                }
             }
-        }
-    }
 
-    // Draw the top border
-    Console.Write(Box.TopLeft);
-    for (int x = 0; x < _map.SizeX; x++)
-    {
-        Console.Write(Box.Horizontal);
-        if (x < _map.SizeX - 1)
-            Console.Write(Box.TopMid);
-    }
-    Console.WriteLine(Box.TopRight);
-
-    // Draw each row with separators
-    for (int y = 0; y < _map.SizeY; y++)
-    {
-        // Draw the vertical border and the cells
-        Console.Write(Box.Vertical);
-        for (int x = 0; x < _map.SizeX; x++)
-        {
-            Console.Write(grid[y, x]);
-            if (x < _map.SizeX - 1)
-                Console.Write(Box.Vertical); // Vertical separator between cells
-        }
-        Console.WriteLine(Box.Vertical);
-
-        // Draw the horizontal line between rows, except after the last row
-        if (y < _map.SizeY - 1)
-        {
-            Console.Write(Box.MidLeft);
+            // Draw the top border
+            Console.Write(Box.TopLeft);
             for (int x = 0; x < _map.SizeX; x++)
             {
                 Console.Write(Box.Horizontal);
                 if (x < _map.SizeX - 1)
-                    Console.Write(Box.Cross);
+                    Console.Write(Box.TopMid);
             }
-            Console.WriteLine(Box.MidRight);
-        }
-    }
+            Console.WriteLine(Box.TopRight);
 
-    // Draw the bottom border
-    Console.Write(Box.BottomLeft);
-    for (int x = 0; x < _map.SizeX; x++)
-    {
-        Console.Write(Box.Horizontal);
-        if (x < _map.SizeX - 1)
-            Console.Write(Box.BottomMid);
-    }
-    Console.WriteLine(Box.BottomRight);
-} 
-        /// <summary>
-        /// Determines the display symbol for a given mappable.
-        /// </summary>
-        /// <param name="mappable">The mappable to get the symbol for.</param>
-        /// <returns>A character representing the mappable.</returns>
-        private char GetSymbol(IMappable mappable)
-        {
-            return mappable switch
+            // Draw each row with separators
+            for (int y = 0; y < _map.SizeY; y++)
             {
-                Orc => 'O',
-                Elf => 'E',
-                _ => '?',
-            };
-        }
-    }
+                // Draw the vertical border and the cells
+                Console.Write(Box.Vertical);
+                for (int x = 0; x < _map.SizeX; x++)
+                {
+                    Console.Write(grid[y, x]);
+                    if (x < _map.SizeX - 1)
+                        Console.Write(Box.Vertical); // Vertical separator between cells
+                }
+                Console.WriteLine(Box.Vertical);
 
-    /// <summary>
-    /// Extension methods for the Map class.
-    /// </summary>
-    public static class MapExtensions
-    {
+                // Draw the horizontal line between rows, except after the last row
+                if (y < _map.SizeY - 1)
+                {
+                    Console.Write(Box.MidLeft);
+                    for (int x = 0; x < _map.SizeX; x++)
+                    {
+                        Console.Write(Box.Horizontal);
+                        if (x < _map.SizeX - 1)
+                            Console.Write(Box.Cross);
+                    }
+                    Console.WriteLine(Box.MidRight);
+                }
+            }
+
+            // Draw the bottom border
+            Console.Write(Box.BottomLeft);
+            for (int x = 0; x < _map.SizeX; x++)
+            {
+                Console.Write(Box.Horizontal);
+                if (x < _map.SizeX - 1)
+                    Console.Write(Box.BottomMid);
+            }
+            Console.WriteLine(Box.BottomRight);
+        }
+
         /// <summary>
         /// Retrieves all mappables present on the map.
         /// </summary>
-        /// <param name="map">The map to query.</param>
         /// <returns>A collection of all mappables on the map.</returns>
-        public static IEnumerable<IMappable> GetAllMappables(this Map map)
+        private IEnumerable<IMappable> GetAllMappables()
         {
             var allMappables = new List<IMappable>();
-            for (int y = 0; y < map.SizeY; y++)
+            for (int y = 0; y < _map.SizeY; y++)
             {
-                for (int x = 0; x < map.SizeX; x++)
+                for (int x = 0; x < _map.SizeX; x++)
                 {
-                    foreach (var mappable in map.At(x, y))
+                    foreach (var mappable in _map.At(x, y))
                     {
                         allMappables.Add(mappable);
                     }

@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Text;
 using Simulator;
 using Simulator.Maps;
-using SimConsole;
 
 namespace SimConsole
 {
@@ -14,18 +13,48 @@ namespace SimConsole
         {
             Console.OutputEncoding = Encoding.UTF8;
 
-            SmallSquareMap map = new SmallSquareMap(5);
-            List<IMappable> creatures = new List<IMappable>
+            SmallTorusMap map = new SmallTorusMap(8, 6);
+            
+            List<IMappable> creatures = new List<IMappable>();
+            
+            var orc = new Orc("Gorbag");
+            orc.InitMapAndPosition(map, new Point(1, 3));
+            creatures.Add(orc);
+            
+            var elf = new Elf("Elandor");
+            elf.InitMapAndPosition(map, new Point(4, 4));
+            creatures.Add(elf);
+            
+            for (int i = 0; i < 3; i++)
             {
-                new Orc("Gorbag"),
-                new Elf("Elandor")
-            };
-            List<Point> points = new List<Point>
+                var rabbit = new Animals { Description = "Rabbit" };
+                rabbit.InitMapAndPosition(map, new Point(2 + i, 2));
+                creatures.Add(rabbit);
+            }
+            
+            for (int i = 0; i < 2; i++)
             {
-                new Point(2, 2),
-                new Point(3, 1)
-            };
-            string moves = "dlrludl";
+                var eagle = new Birds { Description = "Eagle", CanFly = true };
+                eagle.InitMapAndPosition(map, new Point(5, 1 + i));
+                creatures.Add(eagle);
+            }
+
+            // Create and add flightless birds (ostriches)
+            for (int i = 0; i < 2; i++)
+            {
+                var ostrich = new Birds { Description = "Ostrich", CanFly = false };
+                ostrich.InitMapAndPosition(map, new Point(6, 3 + i));
+                creatures.Add(ostrich);
+            }
+            
+            List<Point> points = new List<Point>();
+            Random rand = new Random();
+            foreach (var _ in creatures)
+            {
+                points.Add(new Point(rand.Next(0, 8), rand.Next(0, 6)));
+            }
+
+            string moves = "dlrludludlrudlru"; 
 
             Simulation simulation;
             try
@@ -40,7 +69,7 @@ namespace SimConsole
 
             MapVisualizer mapVisualizer = new MapVisualizer(simulation.Map);
 
-            Console.Clear(); 
+            Console.Clear();
             Console.WriteLine("Initial Map State:");
             mapVisualizer.Draw();
             Console.WriteLine();
@@ -51,7 +80,7 @@ namespace SimConsole
                 {
                     IMappable current = simulation.CurrentMappable;
                     string moveName = simulation.CurrentMoveName;
-                    Console.WriteLine($"Creature '{current.Name}' is moving {moveName}.");
+                    Console.WriteLine($"'{current.Name}' is moving {moveName}.");
                     simulation.Turn();
 
                     Console.WriteLine("Updated Map State:");
@@ -71,35 +100,5 @@ namespace SimConsole
             Console.WriteLine("Simulation has finished.");
             Console.ReadKey();
         }
-    }
-
-    public class Orc : Creature, IMappable
-    {
-        public Orc(string name) : base(name) { }
-
-        public override string Info => $"Name: {Name}, Level: {Level}";
-
-        public override string Greeting() => "Grrrr!";
-
-        public override int Power => Level * 5;
-
-        public void Go(Direction direction) => base.Go(direction);
-
-        public void InitMapAndPosition(Map map, Point point) => base.InitMapAndPosition(map, point);
-    }
-
-    public class Elf : Creature, IMappable
-    {
-        public Elf(string name) : base(name) { }
-
-        public override string Info => $"Name: {Name}, Level: {Level}";
-
-        public override string Greeting() => "Greetings!";
-
-        public override int Power => Level * 7;
-
-        public void Go(Direction direction) => base.Go(direction);
-
-        public void InitMapAndPosition(Map map, Point point) => base.InitMapAndPosition(map, point);
     }
 }
