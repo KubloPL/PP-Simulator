@@ -97,7 +97,7 @@ namespace Simulator
 
             if (creatures.Count != positions.Count)
                 throw new ArgumentException("Number of creatures must match the number of starting positions.");
-
+            
             Map = map;
             Creatures = creatures;
             Positions = positions;

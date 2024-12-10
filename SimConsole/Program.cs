@@ -9,45 +9,56 @@ namespace SimConsole
 {
     class Program
     {
+        // Zmienna przełączająca tryb wyświetlania
+        static bool useHistoryMode = false; // Ustawienie na 'false' daje tryb krok po kroku
+
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
-            
+
+
             BigBounceMap map = new BigBounceMap(8, 6);
 
             List<IMappable> creatures = new List<IMappable>();
             List<Point> positions = new List<Point>();
             
+            Dictionary<string, char> nameToSymbol = new Dictionary<string, char>();
+            
             var orc = new Orc("Gorbag");
             creatures.Add(orc);
             positions.Add(new Point(1, 3));
+            nameToSymbol[orc.Name] = orc.Symbol;
             
             var elf = new Elf("Elandor");
             creatures.Add(elf);
             positions.Add(new Point(4, 4));
+            nameToSymbol[elf.Name] = elf.Symbol;
             
             for (int i = 0; i < 3; i++)
             {
-                var rabbit = new Animals { Description = "Rabbit" };
+                var rabbit = new Animals { Description = $"Rabbit{i + 1}" };
                 creatures.Add(rabbit);
                 positions.Add(new Point(2 + i, 2));
+                nameToSymbol[rabbit.Name] = rabbit.Symbol;
             }
             
             for (int i = 0; i < 2; i++)
             {
-                var eagle = new Birds { Description = "Eagle", CanFly = true };
+                var eagle = new Birds { Description = $"Eagle{i + 1}", CanFly = true };
                 creatures.Add(eagle);
                 positions.Add(new Point(5, 1 + i));
+                nameToSymbol[eagle.Name] = eagle.Symbol;
             }
             
             for (int i = 0; i < 2; i++)
             {
-                var ostrich = new Birds { Description = "Ostrich", CanFly = false };
+                var ostrich = new Birds { Description = $"Ostrich{i + 1}", CanFly = false };
                 creatures.Add(ostrich);
                 positions.Add(new Point(6, 3 + i));
+                nameToSymbol[ostrich.Name] = ostrich.Symbol;
             }
             
-            string moves = "uldruldruldruldruldrul";
+            string moves = "uldruldruldruldruldrul"; 
             
             Simulation simulation;
             try
@@ -60,38 +71,112 @@ namespace SimConsole
                 return;
             }
 
-            MapVisualizer mapVisualizer = new MapVisualizer(simulation.Map);
-
-            Console.Clear();
-            Console.WriteLine("Initial Map State:");
-            mapVisualizer.Draw();
-            Console.WriteLine();
-
-            while (!simulation.Finished)
+            if (useHistoryMode)
             {
-                try
-                {
-                    IMappable current = simulation.CurrentMappable;
-                    string moveName = simulation.CurrentMoveName;
-                    Console.WriteLine($"'{current.Name}' is moving {moveName}.");
-                    simulation.Turn();
+                SimulationHistory history = new SimulationHistory(simulation);
+                
+                List<int> turnsToDisplay = new List<int> { 5, 10, 15, 20 };
 
-                    Console.WriteLine("Updated Map State:");
+                foreach (int turn in turnsToDisplay)
+                {
+                    if (turn > history.TotalTurns)
+                    {
+                        Console.WriteLine($"Turn {turn} is beyond the total number of turns ({history.TotalTurns}).");
+                        continue;
+                    }
+
+                    var entry = history.GetHistoryAtTurn(turn);
+                    
+                    BigBounceMap tempMap = new BigBounceMap(map.SizeX, map.SizeY);
+
+                    foreach (var kvp in entry.Positions)
+                    {
+                        string creatureName = kvp.Key;
+                        Point pos = kvp.Value;
+
+                        if (nameToSymbol.TryGetValue(creatureName, out char symbol))
+                        {
+                            IMappable tempMappable = new TempMappable(creatureName, symbol, pos);
+                            tempMap.Add(tempMappable, pos);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Symbol for creature '{creatureName}' not found.");
+                        }
+                    }
+
+                    MapVisualizer mapVisualizer = new MapVisualizer(tempMap);
+
+                    Console.Clear();
+                    Console.WriteLine($"Map State at Turn {turn}:");
+                    Console.WriteLine($"'{entry.MovedCreatureName}' moved {entry.MoveDirection.ToString().ToLower()}.");
                     mapVisualizer.Draw();
                     Console.WriteLine();
+                }
 
-                    Console.WriteLine("Press any key to proceed to the next turn...");
-                    Console.ReadKey(true);
-                }
-                catch (Exception ex)
+                Console.WriteLine("Simulation history displayed.");
+            }
+            else
+            {
+                MapVisualizer mapVisualizer = new MapVisualizer(simulation.Map);
+
+                Console.Clear();
+                Console.WriteLine("Initial Map State:");
+                mapVisualizer.Draw();
+                Console.WriteLine();
+
+                while (!simulation.Finished)
                 {
-                    Console.WriteLine($"Error during simulation: {ex.Message}");
-                    break;
+                    try
+                    {
+                        IMappable current = simulation.CurrentMappable;
+                        string moveName = simulation.CurrentMoveName;
+                        Console.WriteLine($"'{current.Name}' is moving {moveName}.");
+                        simulation.Turn();
+
+                        Console.WriteLine("Updated Map State:");
+                        mapVisualizer.Draw();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Press any key to proceed to the next turn...");
+                        Console.ReadKey(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error during simulation: {ex.Message}");
+                        break;
+                    }
                 }
+
+                Console.WriteLine("Simulation has finished.");
             }
 
-            Console.WriteLine("Simulation has finished.");
             Console.ReadKey();
+        }
+
+        /// <summary>
+        /// A temporary implementation of IMappable for visualization purposes.
+        /// </summary>
+        private class TempMappable : IMappable
+        {
+            public string Name { get; private set; }
+            public Point Position { get; private set; }
+            public char Symbol { get; private set; }
+
+            public TempMappable(string name, char symbol, Point position)
+            {
+                Name = name;
+                Symbol = symbol;
+                Position = position;
+            }
+
+            public void Go(Direction direction)
+            {
+            }
+
+            public void InitMapAndPosition(Map map, Point point)
+            {
+            }
         }
     }
 }
