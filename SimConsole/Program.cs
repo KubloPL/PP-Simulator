@@ -12,54 +12,47 @@ namespace SimConsole
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
-
-            SmallTorusMap map = new SmallTorusMap(8, 6);
             
+            BigBounceMap map = new BigBounceMap(8, 6);
+
             List<IMappable> creatures = new List<IMappable>();
+            List<Point> positions = new List<Point>();
             
             var orc = new Orc("Gorbag");
-            orc.InitMapAndPosition(map, new Point(1, 3));
             creatures.Add(orc);
+            positions.Add(new Point(1, 3));
             
             var elf = new Elf("Elandor");
-            elf.InitMapAndPosition(map, new Point(4, 4));
             creatures.Add(elf);
+            positions.Add(new Point(4, 4));
             
             for (int i = 0; i < 3; i++)
             {
                 var rabbit = new Animals { Description = "Rabbit" };
-                rabbit.InitMapAndPosition(map, new Point(2 + i, 2));
                 creatures.Add(rabbit);
+                positions.Add(new Point(2 + i, 2));
             }
             
             for (int i = 0; i < 2; i++)
             {
                 var eagle = new Birds { Description = "Eagle", CanFly = true };
-                eagle.InitMapAndPosition(map, new Point(5, 1 + i));
                 creatures.Add(eagle);
+                positions.Add(new Point(5, 1 + i));
             }
-
-            // Create and add flightless birds (ostriches)
+            
             for (int i = 0; i < 2; i++)
             {
                 var ostrich = new Birds { Description = "Ostrich", CanFly = false };
-                ostrich.InitMapAndPosition(map, new Point(6, 3 + i));
                 creatures.Add(ostrich);
+                positions.Add(new Point(6, 3 + i));
             }
             
-            List<Point> points = new List<Point>();
-            Random rand = new Random();
-            foreach (var _ in creatures)
-            {
-                points.Add(new Point(rand.Next(0, 8), rand.Next(0, 6)));
-            }
-
-            string moves = "dlrludludlrudlru"; 
-
+            string moves = "uldruldruldruldruldrul";
+            
             Simulation simulation;
             try
             {
-                simulation = new Simulation(map, creatures, points, moves);
+                simulation = new Simulation(map, creatures, positions, moves);
             }
             catch (Exception ex)
             {
