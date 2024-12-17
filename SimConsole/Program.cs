@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Program.cs
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
@@ -12,8 +13,7 @@ namespace SimConsole
     {
         // Toggle for display mode
         static bool useHistoryMode = false; // 'false' gives step-by-step mode
- 
-        
+
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
@@ -92,6 +92,7 @@ namespace SimConsole
             {
                 SimulationHistory history = new SimulationHistory(simulation);
 
+                // Define which turns to display
                 List<int> turnsToDisplay = new List<int> { 5, 10, 15, 20 };
 
                 foreach (int turn in turnsToDisplay)
@@ -106,19 +107,16 @@ namespace SimConsole
 
                     BigBounceMap tempMap = new BigBounceMap(map.SizeX, map.SizeY);
 
-                    foreach (var kvp in entry.Positions)
+                    // Populate the tempMap based on Symbols
+                    foreach (var kvp in entry.Symbols)
                     {
-                        string creatureName = kvp.Key;
-                        Point pos = kvp.Value;
+                        Point pos = kvp.Key;
+                        char symbol = kvp.Value;
 
-                        if (nameToSymbol.TryGetValue(creatureName, out char symbol))
+                        if (symbol != '\0') // Assuming '\0' means no symbol
                         {
-                            IMappable tempMappable = new TempMappable(creatureName, symbol, pos);
+                            IMappable tempMappable = new TempMappable(symbol, pos);
                             tempMap.Add(tempMappable, pos);
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Symbol for creature '{creatureName}' not found.");
                         }
                     }
 
@@ -126,7 +124,7 @@ namespace SimConsole
 
                     Console.Clear();
                     Console.WriteLine($"Map State at Turn {turn}:");
-                    Console.WriteLine($"'{entry.MovedCreatureName}' moved {entry.MoveDirection.ToString().ToLower()}.");
+                    Console.WriteLine($"'{entry.Mappable}' moved {entry.Move.ToLower()}.");
                     mapVisualizer.Draw();
                     Console.WriteLine();
                 }
@@ -149,7 +147,7 @@ namespace SimConsole
                         IMappable current = simulation.CurrentMappable;
                         string moveName = simulation.CurrentMoveName;
 
-                        Console.WriteLine($"'{current.Name}' is moving {moveName}.");
+                        Console.WriteLine($"'{current.Name}' is moving {moveName.ToLower()}.");
                         simulation.Turn();
 
                         Console.WriteLine("Updated Map State:");
@@ -184,19 +182,22 @@ namespace SimConsole
             public Point Position { get; private set; }
             public char Symbol { get; private set; }
 
-            public TempMappable(string name, char symbol, Point position)
+            public TempMappable(char symbol, Point position)
             {
-                Name = name;
+                // Since only symbol is known, set Name as symbol's string representation
+                Name = symbol.ToString();
                 Symbol = symbol;
                 Position = position;
             }
 
             public void Go(Direction direction)
             {
+                // Implementation not needed for visualization
             }
 
             public void InitMapAndPosition(Map map, Point point)
             {
+                // Implementation not needed for visualization
             }
         }
     }

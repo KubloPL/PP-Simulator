@@ -6,7 +6,7 @@ namespace Simulator.Maps
         Point Position { get; }
         void Go(Direction direction);
         void InitMapAndPosition(Map map, Point point);
-        public char Symbol { get; }
-        public string ToString();  
+        char Symbol { get; }
+        string ToString();  
     }
 }
