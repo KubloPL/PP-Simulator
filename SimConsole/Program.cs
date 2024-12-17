@@ -91,6 +91,7 @@ namespace SimConsole
             if (useHistoryMode)
             {
                 SimulationHistory history = new SimulationHistory(simulation);
+                LogVisualizer logVisualizer = new LogVisualizer(history);
 
                 // Define which turns to display
                 List<int> turnsToDisplay = new List<int> { 5, 10, 15, 20 };
@@ -103,29 +104,10 @@ namespace SimConsole
                         continue;
                     }
 
-                    var entry = history.GetHistoryAtTurn(turn);
-
-                    BigBounceMap tempMap = new BigBounceMap(map.SizeX, map.SizeY);
-
-                    // Populate the tempMap based on Symbols
-                    foreach (var kvp in entry.Symbols)
-                    {
-                        Point pos = kvp.Key;
-                        char symbol = kvp.Value;
-
-                        if (symbol != '\0') // Assuming '\0' means no symbol
-                        {
-                            IMappable tempMappable = new TempMappable(symbol, pos);
-                            tempMap.Add(tempMappable, pos);
-                        }
-                    }
-
-                    MapVisualizer mapVisualizer = new MapVisualizer(tempMap);
-
                     Console.Clear();
                     Console.WriteLine($"Map State at Turn {turn}:");
-                    Console.WriteLine($"'{entry.Mappable}' moved {entry.Move.ToLower()}.");
-                    mapVisualizer.Draw();
+
+                    logVisualizer.Draw(turn);
                     Console.WriteLine();
                 }
 
@@ -197,8 +179,14 @@ namespace SimConsole
 
             public void InitMapAndPosition(Map map, Point point)
             {
-                // Implementation not needed for visualization
+                Position = point;
+                map.Add(this, point);
+            }
+
+            public override string ToString()
+            {
+                return Name;
             }
         }
     }
-}
+} 
