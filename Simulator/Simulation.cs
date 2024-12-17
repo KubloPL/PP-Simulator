@@ -113,6 +113,8 @@ namespace Simulator
                     throw new ArgumentException($"Starting position {position} is out of map bounds for creature {creature.Name}.");
 
                 creature.InitMapAndPosition(Map, position);
+                
+                Map.Add(creature, position);
             }
 
             // Parse the moves into a list of directions
@@ -152,4 +154,4 @@ namespace Simulator
                 Finished = true;
         }
     }
-}
+} 

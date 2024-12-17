@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Threading;
 using Simulator;
 using Simulator.Maps;
 
@@ -9,39 +10,50 @@ namespace SimConsole
 {
     class Program
     {
-        // Zmienna przełączająca tryb wyświetlania
-        static bool useHistoryMode = false; // Ustawienie na 'false' daje tryb krok po kroku
-
+        // Toggle for display mode
+        static bool useHistoryMode = false; // 'false' gives step-by-step mode
+ 
+        
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
-
 
             BigBounceMap map = new BigBounceMap(8, 6);
 
             List<IMappable> creatures = new List<IMappable>();
             List<Point> positions = new List<Point>();
-            
+
             Dictionary<string, char> nameToSymbol = new Dictionary<string, char>();
-            
+
+            // Add Orc
             var orc = new Orc("Gorbag");
             creatures.Add(orc);
             positions.Add(new Point(1, 3));
             nameToSymbol[orc.Name] = orc.Symbol;
-            
+
+            // Add Elf
             var elf = new Elf("Elandor");
             creatures.Add(elf);
             positions.Add(new Point(4, 4));
             nameToSymbol[elf.Name] = elf.Symbol;
-            
+
+            // Add Animals with overlap check
             for (int i = 0; i < 3; i++)
             {
                 var rabbit = new Animals { Description = $"Rabbit{i + 1}" };
+                Point newPosition = new Point(2 + i, 2);
+
+                // Check for overlap
+                if (!positions.Contains(newPosition))
+                    positions.Add(newPosition);
+                else
+                    positions.Add(new Point(3 + i, 3)); // Assign fallback position
+
                 creatures.Add(rabbit);
-                positions.Add(new Point(2 + i, 2));
                 nameToSymbol[rabbit.Name] = rabbit.Symbol;
             }
-            
+
+            // Add Birds (Eagles and Ostriches)
             for (int i = 0; i < 2; i++)
             {
                 var eagle = new Birds { Description = $"Eagle{i + 1}", CanFly = true };
@@ -49,7 +61,7 @@ namespace SimConsole
                 positions.Add(new Point(5, 1 + i));
                 nameToSymbol[eagle.Name] = eagle.Symbol;
             }
-            
+
             for (int i = 0; i < 2; i++)
             {
                 var ostrich = new Birds { Description = $"Ostrich{i + 1}", CanFly = false };
@@ -57,10 +69,14 @@ namespace SimConsole
                 positions.Add(new Point(6, 3 + i));
                 nameToSymbol[ostrich.Name] = ostrich.Symbol;
             }
-            
-            string moves = "uldruldruldruldruldrul"; 
-            
+
+            // Ensure creatures and positions align
+            if (creatures.Count != positions.Count)
+                throw new Exception("Mismatch between creatures and positions count.");
+
+            string moves = "uldruldruldruldruldrul";
             Simulation simulation;
+
             try
             {
                 simulation = new Simulation(map, creatures, positions, moves);
@@ -71,10 +87,11 @@ namespace SimConsole
                 return;
             }
 
+            // Display simulation
             if (useHistoryMode)
             {
                 SimulationHistory history = new SimulationHistory(simulation);
-                
+
                 List<int> turnsToDisplay = new List<int> { 5, 10, 15, 20 };
 
                 foreach (int turn in turnsToDisplay)
@@ -86,7 +103,7 @@ namespace SimConsole
                     }
 
                     var entry = history.GetHistoryAtTurn(turn);
-                    
+
                     BigBounceMap tempMap = new BigBounceMap(map.SizeX, map.SizeY);
 
                     foreach (var kvp in entry.Positions)
@@ -131,12 +148,16 @@ namespace SimConsole
                     {
                         IMappable current = simulation.CurrentMappable;
                         string moveName = simulation.CurrentMoveName;
+
                         Console.WriteLine($"'{current.Name}' is moving {moveName}.");
                         simulation.Turn();
 
                         Console.WriteLine("Updated Map State:");
                         mapVisualizer.Draw();
                         Console.WriteLine();
+
+                        // Add delay for visualization
+                        Thread.Sleep(500);
 
                         Console.WriteLine("Press any key to proceed to the next turn...");
                         Console.ReadKey(true);

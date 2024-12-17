@@ -48,14 +48,14 @@ namespace SimConsole
                     char symbol = mappable.Symbol;
 
                     // If multiple mappables are on the same position, mark as 'X'
-                    if (grid[pos.Y, pos.X] == ' ' || grid[pos.Y, pos.X] == symbol)
-                    {
-                        grid[pos.Y, pos.X] = symbol;
-                    }
+                    if (grid[pos.Y, pos.X] == ' ')
+                        grid[pos.Y, pos.X] = symbol; // Add creature symbol
                     else
-                    {
-                        grid[pos.Y, pos.X] = 'X';
-                    }
+                        grid[pos.Y, pos.X] = 'X'; // Mark overlap
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: {mappable.Name} at invalid position {pos}.");
                 }
             }
 

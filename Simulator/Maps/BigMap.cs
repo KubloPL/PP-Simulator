@@ -35,9 +35,14 @@ namespace Simulator.Maps
                 {
                     Mappables[point] = new List<IMappable>();
                 }
-                Mappables[point].Add(mappable);
+        
+                // Prevent duplicates
+                if (!Mappables[point].Contains(mappable))
+                {
+                    Mappables[point].Add(mappable);
+                }
             }
-        }
+        } 
 
         public override void Remove(IMappable mappable, Point point)
         {
@@ -62,8 +67,8 @@ namespace Simulator.Maps
                 Add(mappable, to);
             }
         }
-
-        public override IEnumerable<IMappable> At(Point point)
+        
+        public override List<IMappable> At(Point point)
         {
             lock (_lock)
             {
@@ -74,8 +79,7 @@ namespace Simulator.Maps
                 return new List<IMappable>();
             }
         }
-
-        public override IEnumerable<IMappable> At(int x, int y)
+        public override List<IMappable> At(int x, int y)
         {
             return At(new Point(x, y));
         }
